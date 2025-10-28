@@ -5,111 +5,32 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>포트폴리오 — @wjdrudfhr_</title>
   <style>
-    :root {
-      --bg: #0b0b0b;
-      --accent: #58a6ff;
-      --panel: #0f1113;
-      --muted: #9ba1a7;
-    }
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Pretendard', 'Inter', sans-serif;
-      background: radial-gradient(circle at top left, #1a1a1a, #0b0b0b);
-      color: #fff;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 24px 32px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .logo {
-      font-size: 2em;
-      font-weight: 700;
-      background: linear-gradient(90deg, #fff, #58a6ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .subtitle {
-      font-size: 0.9em;
-      color: var(--accent);
-      margin-top: 4px;
-      font-weight: 500;
-    }
-    main {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 32px;
-      padding: 32px;
-    }
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 60px 20px;
-      background: linear-gradient(135deg, #1a1a1a, #0b0b0b);
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.7);
-      margin-bottom: 32px;
-    }
-    .hero h1 {
-      font-size: 2.5em;
-      margin: 0;
-      background: linear-gradient(90deg, #fff, #58a6ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero p {
-      font-size: 1.2em;
-      color: var(--muted);
-      margin-top: 10px;
-    }
-    .projects {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    }
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-    }
-    .card-body {
-      padding: 14px;
-    }
-    .card-body h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-    .card-body .date {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: var(--muted);
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
+    :root { --bg:#0b0b0b; --accent:#58a6ff; --panel:#0f1113; --muted:#9ba1a7; }
+    html, body { height:100%; margin:0; font-family:'Pretendard','Inter',sans-serif; background: radial-gradient(circle at top left, #1a1a1a, #0b0b0b); color:#fff; overflow-x:hidden; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:24px 32px; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; animation:fadeInDown 1s ease; }
+    .logo { font-size:2em; font-weight:700; background:linear-gradient(90deg,#fff,#58a6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:logoPulse 2s infinite alternate; }
+    .subtitle { font-size:0.9em; color:var(--accent); margin-top:4px; font-weight:500; animation:fadeIn 2s ease; }
+    .btn-add-project { background:var(--accent); border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; color:#fff; transition:transform 0.2s; }
+    .btn-add-project:hover { transform:scale(1.05); }
+    main { display:grid; grid-template-columns:1fr; gap:32px; padding:32px; }
+    .hero { display:flex; flex-direction:column; align-items:center; text-align:center; padding:60px 20px; background:linear-gradient(135deg,#1a1a1a,#0b0b0b); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.7); margin-bottom:32px; animation:fadeIn 1.5s ease; }
+    .projects { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; transition:transform 0.3s ease, box-shadow 0.3s ease; padding:16px; cursor:pointer; }
+    .card:hover { transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,0.8); }
+    .card-body h3 { margin:0 0 6px 0; font-size:18px; }
+    .card-body p { font-size:14px; color:var(--muted); margin:0 0 6px 0; }
+    .card-body a { color:var(--accent); text-decoration:none; }
+    .popup-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:100; }
+    .popup { background:var(--panel); padding:24px; border-radius:16px; max-width:500px; width:90%; box-shadow:0 8px 30px rgba(0,0,0,0.7); animation:fadeIn 0.5s ease; }
+    .popup h2 { margin-top:0; }
+    .popup label { display:block; margin-top:12px; color:var(--muted); }
+    .popup input, .popup textarea { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:#fff; margin-top:6px; }
+    .popup button { margin-top:12px; background:var(--accent); border:none; color:#fff; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes logoPulse { from{opacity:0.7} to{opacity:1} }
+    /* 추가 애니메이션 */
+    .card-body a:hover { text-decoration:underline; color:#fff; }
   </style>
 </head>
 <body>
@@ -118,20 +39,32 @@
       <div class="logo">@wjdrudfhr_</div>
       <div class="subtitle">나만의 프로젝트 공간</div>
     </div>
-    <div>
-      <button id="btn-new">새 프로젝트 추가</button>
-    </div>
+    <button class="btn-add-project" id="btn-add-project">프로젝트 추가</button>
   </header>
 
   <main>
     <div class="hero">
       <h1>포트폴리오에 오신 것을 환영합니다</h1>
-      <p>프로젝트들을 한눈에 확인하고 GitHub 링크로 바로 이동할 수 있습니다.</p>
+      <p>아래에서 프로젝트를 확인하고 GitHub 링크로 바로 이동하세요.</p>
     </div>
+
     <section class="projects" id="projects">
-      <!-- 프로젝트 카드가 여기 표시됩니다 -->
+      <!-- 프로젝트 카드 표시 -->
     </section>
   </main>
+
+  <div class="popup-overlay" id="popup-overlay">
+    <div class="popup">
+      <h2>프로젝트 추가</h2>
+      <label>프로젝트 제목</label>
+      <input type="text" id="proj-title" placeholder="제목 입력">
+      <label>설명 / 개발 로그</label>
+      <textarea id="proj-desc" placeholder="설명 및 개발 로그"></textarea>
+      <label>GitHub 링크</label>
+      <input type="text" id="proj-link" placeholder="https://github.com/username/repo">
+      <button id="btn-save">저장</button>
+    </div>
+  </div>
 
   <footer>
     <small>© 2025 개발자 노트 — Firebase와 함께</small>
@@ -139,7 +72,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyAaYIB1Ows4tOVIQotQCyFHFR2h3pBEeTg",
@@ -155,76 +88,50 @@
     const app = initializeApp(FIREBASE_CONFIG);
     const db = getDatabase(app);
 
-    const STORE_KEY = 'portfolio_projects_v6';
-    const $ = id => document.getElementById(id);
     let projects = [];
+    const projectsRef = ref(db, 'projects');
 
-    function uid(len = 8) { return Math.random().toString(36).substring(2, 2 + len); }
-
-    async function loadProjects() {
-      try {
-        const snapshot = await get(child(ref(db), 'projects'));
-        projects = snapshot.exists() ? Object.values(snapshot.val()) : [];
-        renderProjects();
-      } catch(e) {
-        console.error('Firebase 읽기 실패:', e);
-        projects = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-        renderProjects();
-      }
-    }
-
-    function saveLocal() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(projects));
+    onValue(projectsRef, snapshot => {
+      const data = snapshot.val() || {};
+      projects = Object.values(data);
       renderProjects();
-    }
+    });
 
-    function renderProjects() {
-      const container = $('projects');
+    function renderProjects(){
+      const container = document.getElementById('projects');
       container.innerHTML = '';
-      projects.forEach(p => {
+      projects.forEach(p=>{
         const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          ${p.img ? `<img src="${p.img}" alt="cover">` : ''}
-          <div class="card-body">
-            <h3>${p.title || '제목 없음'}</h3>
-            <div class="date">${new Date(p.created).toLocaleString()}</div>
-            <p style="margin:8px 0 0;font-size:13px;color:#ccc;">${p.desc ? p.desc.slice(0,100) : ''}...</p>
-            <div style="margin-top:10px;display:flex;gap:8px;">
-              ${p.git ? `<a href="${p.git}" target="_blank"><button>GitHub</button></a>` : ''}
-            </div>
-          </div>`;
+        card.className='card';
+        card.innerHTML=`<div class="card-body"><h3>${p.title}</h3><p>${p.desc}</p><a href="${p.link}" target="_blank">GitHub 보기</a></div>`;
         container.appendChild(card);
       });
     }
 
-    async function saveProject(title, desc, git, img) {
-      const project = {
-        id: uid(10),
-        title,
-        desc,
-        git,
-        img,
-        created: Date.now()
-      };
-      projects.unshift(project);
-      saveLocal();
-      try {
-        await set(ref(db, 'projects/' + project.id), project);
-      } catch(e) {
-        console.error('Firebase 쓰기 실패:', e);
-      }
+    function showPopup(){
+      document.getElementById('popup-overlay').style.display='flex';
+      document.getElementById('proj-title').value='';
+      document.getElementById('proj-desc').value='';
+      document.getElementById('proj-link').value='';
     }
 
-    window.addEventListener('load', loadProjects);
+    function hidePopup(){
+      document.getElementById('popup-overlay').style.display='none';
+    }
 
-    document.getElementById('btn-new').addEventListener('click', async () => {
-      const title = prompt('프로젝트 제목을 입력하세요');
-      if (!title) return;
-      const desc = prompt('프로젝트 설명/메모를 입력하세요');
-      const git = prompt('GitHub 링크를 입력하세요');
-      const img = prompt('표지 이미지 URL을 입력하세요 (선택)');
-      await saveProject(title, desc, git, img);
+    document.getElementById('btn-add-project').addEventListener('click', showPopup);
+    document.getElementById('popup-overlay').addEventListener('click', (e)=>{if(e.target===e.currentTarget) hidePopup();});
+
+    document.getElementById('btn-save').addEventListener('click',()=>{
+      const title=document.getElementById('proj-title').value.trim();
+      const desc=document.getElementById('proj-desc').value.trim();
+      const link=document.getElementById('proj-link').value.trim();
+      if(!title || !link){alert('제목과 GitHub 링크는 필수입니다.'); return;}
+      const newProj={title,desc,link};
+      projects.unshift(newProj);
+      renderProjects();
+      hidePopup();
+      push(projectsRef, newProj);
     });
   </script>
 </body>
