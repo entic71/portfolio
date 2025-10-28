@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>포트폴리오 — @wjdrudfhr_</title>
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --accent: #58a6ff;
+      --panel: #0f1113;
+      --muted: #9ba1a7;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Pretendard', 'Inter', sans-serif;
+      background: radial-gradient(circle at top left, #1a1a1a, #0b0b0b);
+      color: #fff;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo {
+      font-size: 2em;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #58a6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 0.9em;
+      color: var(--accent);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: 32px;
+    }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #1a1a1a, #0b0b0b);
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-size: 2.5em;
+      margin: 0;
+      background: linear-gradient(90deg, #fff, #58a6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.2em;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 14px;
+    }
+    .card-body h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .card-body .date {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="logo">@wjdrudfhr_</div>
+      <div class="subtitle">나만의 프로젝트 공간</div>
+    </div>
+    <div>
+      <button id="btn-new">새 프로젝트 추가</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>포트폴리오에 오신 것을 환영합니다</h1>
+      <p>프로젝트들을 한눈에 확인하고 GitHub 링크로 바로 이동할 수 있습니다.</p>
+    </div>
+    <section class="projects" id="projects">
+      <!-- 프로젝트 카드가 여기 표시됩니다 -->
+    </section>
+  </main>
+
+  <footer>
+    <small>© 2025 개발자 노트 — Firebase와 함께</small>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAaYIB1Ows4tOVIQotQCyFHFR2h3pBEeTg",
+      authDomain: "jungportfolio-b803e.firebaseapp.com",
+      databaseURL: "https://jungportfolio-b803e-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "jungportfolio-b803e",
+      storageBucket: "jungportfolio-b803e.appspot.com",
+      messagingSenderId: "204994545121",
+      appId: "1:204994545121:web:d3e6879b5061781b433ea0",
+      measurementId: "G-V6LDTJ90QH"
+    };
+
+    const app = initializeApp(FIREBASE_CONFIG);
+    const db = getDatabase(app);
+
+    const STORE_KEY = 'portfolio_projects_v6';
+    const $ = id => document.getElementById(id);
+    let projects = [];
+
+    function uid(len = 8) { return Math.random().toString(36).substring(2, 2 + len); }
+
+    async function loadProjects() {
+      try {
+        const snapshot = await get(child(ref(db), 'projects'));
+        projects = snapshot.exists() ? Object.values(snapshot.val()) : [];
+        renderProjects();
+      } catch(e) {
+        console.error('Firebase 읽기 실패:', e);
+        projects = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+        renderProjects();
+      }
+    }
+
+    function saveLocal() {
+      localStorage.setItem(STORE_KEY, JSON.stringify(projects));
+      renderProjects();
+    }
+
+    function renderProjects() {
+      const container = $('projects');
+      container.innerHTML = '';
+      projects.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          ${p.img ? `<img src="${p.img}" alt="cover">` : ''}
+          <div class="card-body">
+            <h3>${p.title || '제목 없음'}</h3>
+            <div class="date">${new Date(p.created).toLocaleString()}</div>
+            <p style="margin:8px 0 0;font-size:13px;color:#ccc;">${p.desc ? p.desc.slice(0,100) : ''}...</p>
+            <div style="margin-top:10px;display:flex;gap:8px;">
+              ${p.git ? `<a href="${p.git}" target="_blank"><button>GitHub</button></a>` : ''}
+            </div>
+          </div>`;
+        container.appendChild(card);
+      });
+    }
+
+    async function saveProject(title, desc, git, img) {
+      const project = {
+        id: uid(10),
+        title,
+        desc,
+        git,
+        img,
+        created: Date.now()
+      };
+      projects.unshift(project);
+      saveLocal();
+      try {
+        await set(ref(db, 'projects/' + project.id), project);
+      } catch(e) {
+        console.error('Firebase 쓰기 실패:', e);
+      }
+    }
+
+    window.addEventListener('load', loadProjects);
+
+    document.getElementById('btn-new').addEventListener('click', async () => {
+      const title = prompt('프로젝트 제목을 입력하세요');
+      if (!title) return;
+      const desc = prompt('프로젝트 설명/메모를 입력하세요');
+      const git = prompt('GitHub 링크를 입력하세요');
+      const img = prompt('표지 이미지 URL을 입력하세요 (선택)');
+      await saveProject(title, desc, git, img);
+    });
+  </script>
+</body>
+</html>
