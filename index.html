@@ -7,15 +7,15 @@
   <style>
     :root { --bg:#0b0b0b; --accent:#58a6ff; --panel:#0f1113; --muted:#9ba1a7; }
     html, body { height:100%; margin:0; font-family:'Pretendard','Inter',sans-serif; background: radial-gradient(circle at top left, #1a1a1a, #0b0b0b); color:#fff; overflow-x:hidden; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:24px 32px; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; animation:fadeInDown 1s ease; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:24px 32px; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); }
     .logo { font-size:2em; font-weight:700; background:linear-gradient(90deg,#fff,#58a6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:logoPulse 2s infinite alternate; }
     .subtitle { font-size:0.9em; color:var(--accent); margin-top:4px; font-weight:500; animation:fadeIn 2s ease; }
     .btn-add-project { background:var(--accent); border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; color:#fff; transition:transform 0.2s; }
     .btn-add-project:hover { transform:scale(1.05); }
     main { display:grid; grid-template-columns:1fr; gap:32px; padding:32px; }
-    .hero { display:flex; flex-direction:column; align-items:center; text-align:center; padding:60px 20px; background:linear-gradient(135deg,#1a1a1a,#0b0b0b); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.7); margin-bottom:32px; animation:fadeIn 1.5s ease; }
+    .hero { display:flex; flex-direction:column; align-items:center; text-align:center; padding:60px 20px; background:linear-gradient(135deg,#1a1a1a,#0b0b0b); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.5); }
     .projects { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
-    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; transition:transform 0.3s ease, box-shadow 0.3s ease; padding:16px; cursor:pointer; opacity:0; transform:translateY(20px); animation:fadeUp 0.5s forwards; }
+    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; transition:transform 0.3s ease, box-shadow 0.3s ease; padding:16px; cursor:pointer; }
     .card:hover { transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,0.8); }
     .card-body h3 { margin:0 0 6px 0; font-size:18px; }
     .card-body p { font-size:14px; color:var(--muted); margin:0 0 6px 0; }
@@ -26,6 +26,8 @@
     .popup label { display:block; margin-top:12px; color:var(--muted); }
     .popup input, .popup textarea { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:#fff; margin-top:6px; }
     .popup button { margin-top:12px; background:var(--accent); border:none; color:#fff; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+    .popup .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .btn-secondary { background:transparent; border:1px solid rgba(255,255,255,0.08); color:var(--muted); }
     footer { text-align:center; padding:16px; color:var(--muted); font-size:0.8em; }
     @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
@@ -61,8 +63,13 @@
       <textarea id="proj-desc" placeholder="설명 및 개발 로그"></textarea>
       <label>GitHub 링크</label>
       <input type="text" id="proj-link" placeholder="https://github.com/username/repo">
-      <button id="btn-save">저장</button>
-      <button id="btn-github" style="display:none;">GitHub 이동</button>
+      <div class="actions">
+        <button id="btn-save">저장</button>
+        <button id="btn-github" class="btn-secondary" style="display:none;">GitHub 이동</button>
+        <button id="btn-edit" class="btn-secondary" style="display:none;">수정하기</button>
+        <button id="btn-update" style="display:none;">변경 저장</button>
+        <button id="btn-close" class="btn-secondary">닫기</button>
+      </div>
     </div>
   </div>
 
@@ -70,7 +77,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyAaYIB1Ows4tOVIQotQCyFHFR2h3pBEeTg",
@@ -88,10 +95,12 @@
     const projectsRef = ref(db, 'projects');
 
     let projects = [];
+    let currentEditId = null;
 
     onValue(projectsRef, snapshot => {
       const data = snapshot.val() || {};
-      projects = Object.values(data);
+      // Preserve keys so we can update specific items later
+      projects = Object.entries(data).map(([id, val]) => ({ id, ...val }));
       renderProjects();
     });
 
@@ -102,7 +111,7 @@
         const card = document.createElement('div');
         card.className='card';
         card.style.animationDelay = `${i*0.1}s`;
-        card.innerHTML = `<div class="card-body"><h3>${p.title}</h3><p>${p.desc.substring(0,50)}...</p></div>`;
+        card.innerHTML = `<div class="card-body"><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml((p.desc||'').substring(0,50))}...</p></div>`;
         container.appendChild(card);
 
         card.addEventListener('click', ()=>showProjectDetail(p));
@@ -115,8 +124,14 @@
       document.getElementById('proj-title').value='';
       document.getElementById('proj-desc').value='';
       document.getElementById('proj-link').value='';
+      document.getElementById('proj-title').disabled = false;
+      document.getElementById('proj-desc').disabled = false;
+      document.getElementById('proj-link').disabled = false;
       document.getElementById('btn-save').style.display='inline-block';
       document.getElementById('btn-github').style.display='none';
+      document.getElementById('btn-edit').style.display='none';
+      document.getElementById('btn-update').style.display='none';
+      currentEditId = null;
       popup.style.animation='popupFade 0.3s forwards';
       document.getElementById('popup-overlay').style.display='flex';
     }
@@ -124,34 +139,75 @@
     function showProjectDetail(proj){
       const popup = document.getElementById('popup');
       document.getElementById('popup-title').textContent='프로젝트 상세보기';
-      document.getElementById('proj-title').value = proj.title;
-      document.getElementById('proj-desc').value = proj.desc;
-      document.getElementById('proj-link').value = proj.link;
+      document.getElementById('proj-title').value = proj.title || '';
+      document.getElementById('proj-desc').value = proj.desc || '';
+      document.getElementById('proj-link').value = proj.link || '';
+      // start as read-only
+      document.getElementById('proj-title').disabled = true;
+      document.getElementById('proj-desc').disabled = true;
+      document.getElementById('proj-link').disabled = true;
       document.getElementById('btn-save').style.display='none';
       const githubBtn = document.getElementById('btn-github');
       githubBtn.style.display='inline-block';
-      githubBtn.onclick = ()=>window.open(proj.link,'_blank');
+      githubBtn.onclick = ()=>{ if(proj.link) window.open(proj.link,'_blank'); };
+      document.getElementById('btn-edit').style.display='inline-block';
+      document.getElementById('btn-update').style.display='none';
+      currentEditId = proj.id;
+      // when edit clicked, allow editing
+      document.getElementById('btn-edit').onclick = ()=>{
+        document.getElementById('proj-title').disabled = false;
+        document.getElementById('proj-desc').disabled = false;
+        document.getElementById('proj-link').disabled = false;
+        document.getElementById('btn-update').style.display='inline-block';
+        document.getElementById('btn-edit').style.display='none';
+      };
       popup.style.animation='popupFade 0.3s forwards';
       document.getElementById('popup-overlay').style.display='flex';
     }
 
     function hidePopup(){
       document.getElementById('popup-overlay').style.display='none';
+      currentEditId = null;
+    }
+
+    // Utility: simple HTML escape to avoid injection in innerHTML
+    function escapeHtml(str){
+      if(!str) return '';
+      return str.replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
     }
 
     document.getElementById('btn-add-project').addEventListener('click', showPopup);
     document.getElementById('popup-overlay').addEventListener('click', e=>{if(e.target===e.currentTarget) hidePopup();});
-    document.getElementById('btn-save').addEventListener('click', ()=>{
+    document.getElementById('btn-close').addEventListener('click', hidePopup);
+
+    document.getElementById('btn-save').addEventListener('click', async ()=>{
       const title = document.getElementById('proj-title').value.trim();
       const desc = document.getElementById('proj-desc').value.trim();
       const link = document.getElementById('proj-link').value.trim();
       if(!title||!link){alert('제목과 GitHub 링크는 필수입니다.'); return;}
       const newProj = {title, desc, link};
-      projects.unshift(newProj);
-      renderProjects();
-      hidePopup();
-      push(projectsRef, newProj);
+      // push to firebase; onValue will refresh list automatically
+      try{
+        await push(projectsRef, newProj);
+        hidePopup();
+      }catch(e){
+        console.error(e);
+        alert('저장 중 오류가 발생했습니다.');
+      }
     });
-  </script>
-</body>
-</html>
+
+    document.getElementById('btn-update').addEventListener('click', async ()=>{
+      if(!currentEditId){ alert('수정 대상이 없습니다.'); return; }
+      const title = document.getElementById('proj-title').value.trim();
+      const desc = document.getElementById('proj-desc').value.trim();
+      const link = document.getElementById('proj-link').value.trim();
+      if(!title||!link){alert('제목과 GitHub 링크는 필수입니다.'); return;}
+      const updated = { title, desc, link };
+      const itemRef = ref(db, `projects/${currentEditId}`);
+      try{
+        await update(itemRef, updated);
+        hidePopup();
+      }catch(e){
+        console.error(e);
+        alert('수정 중 오류가 발생했습니다.');
+      }
