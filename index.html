@@ -1,180 +1,203 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>포트폴리오 — @wjdrudfhr_</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>프로젝트 보드</title>
   <style>
-    :root { --bg:#0b0b0b; --accent:#58a6ff; --panel:#0f1113; --muted:#9ba1a7; }
-    html, body { height:100%; margin:0; font-family:'Pretendard','Inter',sans-serif; background: radial-gradient(circle at top left, #1a1a1a, #0b0b0b); color:#fff; overflow-x:hidden; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:24px 32px; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; animation:fadeInDown 1s ease; }
-    .logo { font-size:2em; font-weight:700; background:linear-gradient(90deg,#fff,#58a6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:logoPulse 2s infinite alternate; }
-    .subtitle { font-size:0.9em; color:var(--accent); margin-top:4px; font-weight:500; animation:fadeIn 2s ease; }
-    .btn-add-project { background:var(--accent); border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; color:#fff; transition:transform 0.2s; }
-    .btn-add-project:hover { transform:scale(1.05); }
-    main { display:grid; grid-template-columns:1fr; gap:32px; padding:32px; }
-    .hero { display:flex; flex-direction:column; align-items:center; text-align:center; padding:60px 20px; background:linear-gradient(135deg,#1a1a1a,#0b0b0b); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.7); margin-bottom:32px; animation:fadeIn 1.5s ease; }
-    .projects { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
-    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; transition:transform 0.3s ease, box-shadow 0.3s ease; padding:16px; cursor:pointer; opacity:0; transform:translateY(20px); animation:fadeUp 0.5s forwards; }
-    .card:hover { transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,0.8); }
-    .card-body h3 { margin:0 0 6px 0; font-size:18px; }
-    .card-body p { font-size:14px; color:var(--muted); margin:0 0 6px 0; }
-    .popup-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:100; }
-    .popup { background:var(--panel); padding:24px; border-radius:16px; max-width:500px; width:90%; box-shadow:0 8px 30px rgba(0,0,0,0.7); transform:scale(0.8); opacity:0; animation:popupFade 0.3s forwards; }
-    .popup h2 { margin-top:0; }
-    .popup label { display:block; margin-top:12px; color:var(--muted); }
-    .popup input, .popup textarea { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:#fff; margin-top:6px; }
-    .popup button { margin-top:12px; background:var(--accent); border:none; color:#fff; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
-    footer { text-align:center; padding:16px; color:var(--muted); font-size:0.8em; }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes logoPulse { from{opacity:0.7} to{opacity:1} }
-    @keyframes fadeUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
-    @keyframes popupFade { from{opacity:0; transform:scale(0.8);} to{opacity:1; transform:scale(1);} }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #222;
+      color: white;
+      text-align: center;
+      padding: 1.2em 0;
+      font-size: 1.4em;
+    }
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .project-form input, .project-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .project-form button {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .project-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
+    .card {
+      background: #fafafa;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .modal-content button {
+      margin-top: 8px;
+      background: #222;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-close {
+      text-align: right;
+      margin-bottom: 8px;
+    }
+    .modal-close button {
+      background: none;
+      color: #888;
+      font-size: 1.2em;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <div class="logo">@wjdrudfhr_</div>
-      <div class="subtitle">포트폴리오</div>
-    </div>
-    <button class="btn-add-project" id="btn-add-project">프로젝트 추가</button>
-  </header>
-
+  <header>🔥 프로젝트 보드</header>
   <main>
-    <div class="hero">
-      <h1>포트폴리오에 오신 것을 환영합니다</h1>
-      <p>아래에서 프로젝트를 확인하고 GitHub 링크로 바로 이동하세요.</p>
+    <div class="project-form">
+      <input type="text" id="title" placeholder="프로젝트 제목">
+      <textarea id="description" placeholder="프로젝트 설명"></textarea>
+      <button onclick="addProject()">추가</button>
     </div>
-    <section class="projects" id="projects"></section>
+    <div class="project-list" id="projectList"></div>
   </main>
 
-  <div class="popup-overlay" id="popup-overlay">
-    <div class="popup" id="popup">
-      <h2 id="popup-title">프로젝트 추가</h2>
-      <label>프로젝트 제목</label>
-      <input type="text" id="proj-title" placeholder="제목 입력">
-      <label>설명 / 개발 로그</label>
-      <textarea id="proj-desc" placeholder="설명 및 개발 로그"></textarea>
-      <label>GitHub 링크</label>
-      <input type="text" id="proj-link" placeholder="https://github.com/username/repo">
-      <label>비밀번호</label>
-      <input type="password" id="proj-pass" placeholder="비밀번호 입력">
-      <button id="btn-save">저장</button>
-      <button id="btn-update" style="display:none;">수정 저장</button>
-      <button id="btn-github" style="display:none;">GitHub 이동</button>
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <div class="modal-close">
+        <button onclick="closeModal()">✕</button>
+      </div>
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+      <hr>
+      <h4>수정하기</h4>
+      <input type="password" id="passwordInput" placeholder="비밀번호 (2580)">
+      <input type="text" id="editTitle" placeholder="새 제목">
+      <textarea id="editDescription" placeholder="새 설명"></textarea>
+      <button onclick="updateProject()">수정 저장</button>
     </div>
   </div>
 
-  <footer>© 2025 개발자 노트 — Firebase와 함께</footer>
+  <script>
+    let projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    let selectedIndex = null;
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    function saveProjects() {
+      localStorage.setItem('projects', JSON.stringify(projects));
+    }
 
-    const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyAaYIB1Ows4tOVIQotQCyFHFR2h3pBEeTg",
-      authDomain: "jungportfolio-b803e.firebaseapp.com",
-      databaseURL: "https://jungportfolio-b803e-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "jungportfolio-b803e",
-      storageBucket: "jungportfolio-b803e.appspot.com",
-      messagingSenderId: "204994545121",
-      appId: "1:204994545121:web:d3e6879b5061781b433ea0",
-      measurementId: "G-V6LDTJ90QH"
-    };
-
-    const app = initializeApp(FIREBASE_CONFIG);
-    const db = getDatabase(app);
-    const projectsRef = ref(db, 'projects');
-    let projects = [];
-    let editingKey = null;
-
-    onValue(projectsRef, snapshot => {
-      const data = snapshot.val() || {};
-      projects = Object.entries(data).map(([key, val]) => ({ key, ...val }));
+    function addProject() {
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      if (!title || !description) return alert('제목과 설명을 모두 입력하세요.');
+      projects.push({ title, description });
+      saveProjects();
+      document.getElementById('title').value = '';
+      document.getElementById('description').value = '';
       renderProjects();
-    });
+    }
 
-    function renderProjects(){
-      const container = document.getElementById('projects');
-      container.innerHTML = '';
-      projects.forEach((p,i)=>{
+    function renderProjects() {
+      const list = document.getElementById('projectList');
+      list.innerHTML = '';
+      projects.forEach((p, i) => {
         const card = document.createElement('div');
-        card.className='card';
-        card.style.animationDelay = `${i*0.1}s`;
-        card.innerHTML = `<div class="card-body"><h3>${p.title}</h3><p>${p.desc.substring(0,50)}...</p></div>`;
-        container.appendChild(card);
-        card.addEventListener('click', ()=>showProjectDetail(p));
+        card.className = 'card';
+        card.innerHTML = `<h3>${p.title}</h3><p>${p.description.slice(0, 50)}...</p>`;
+        card.onclick = () => openModal(i);
+        list.appendChild(card);
       });
     }
 
-    function showPopup(editing=false, project=null){
-      const popup = document.getElementById('popup');
-      document.getElementById('popup-overlay').style.display='flex';
-      popup.style.animation='popupFade 0.3s forwards';
-      document.getElementById('btn-save').style.display = editing ? 'none' : 'inline-block';
-      document.getElementById('btn-update').style.display = editing ? 'inline-block' : 'none';
-      document.getElementById('btn-github').style.display='none';
-      document.getElementById('popup-title').textContent = editing ? '프로젝트 수정' : '프로젝트 추가';
-      document.getElementById('proj-title').value = project?.title || '';
-      document.getElementById('proj-desc').value = project?.desc || '';
-      document.getElementById('proj-link').value = project?.link || '';
-      document.getElementById('proj-pass').value = '';
+    function openModal(index) {
+      selectedIndex = index;
+      const p = projects[index];
+      document.getElementById('modalTitle').textContent = p.title;
+      document.getElementById('modalDescription').textContent = p.description;
+      document.getElementById('editTitle').value = '';
+      document.getElementById('editDescription').value = '';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('detailModal').style.display = 'flex';
     }
 
-    function showProjectDetail(proj){
-      const popup = document.getElementById('popup');
-      document.getElementById('popup-overlay').style.display='flex';
-      document.getElementById('popup-title').textContent='프로젝트 상세보기';
-      document.getElementById('proj-title').value = proj.title;
-      document.getElementById('proj-desc').value = proj.desc;
-      document.getElementById('proj-link').value = proj.link;
-      document.getElementById('proj-pass').value = '';
-      document.getElementById('btn-save').style.display='none';
-      const githubBtn = document.getElementById('btn-github');
-      githubBtn.style.display='inline-block';
-      githubBtn.onclick = ()=>window.open(proj.link,'_blank');
-      const updateBtn = document.getElementById('btn-update');
-      updateBtn.style.display='inline-block';
-      updateBtn.onclick = ()=>{
-        const pass = prompt("수정 비밀번호를 입력하세요:");
-        if(pass === "2580"){ editingKey = proj.key; showPopup(true, proj); }
-        else alert("비밀번호가 틀렸습니다.");
-      };
+    function closeModal() {
+      document.getElementById('detailModal').style.display = 'none';
     }
 
-    function hidePopup(){ document.getElementById('popup-overlay').style.display='none'; }
+    function updateProject() {
+      const pw = document.getElementById('passwordInput').value;
+      if (pw !== '2580') return alert('비밀번호가 틀렸습니다.');
+      const newTitle = document.getElementById('editTitle').value.trim();
+      const newDesc = document.getElementById('editDescription').value.trim();
+      if (!newTitle && !newDesc) return alert('수정할 내용을 입력하세요.');
+      if (newTitle) projects[selectedIndex].title = newTitle;
+      if (newDesc) projects[selectedIndex].description = newDesc;
+      saveProjects();
+      renderProjects();
+      closeModal();
+      alert('수정 완료!');
+    }
 
-    document.getElementById('btn-add-project').addEventListener('click', ()=>showPopup());
-    document.getElementById('popup-overlay').addEventListener('click', e=>{if(e.target===e.currentTarget) hidePopup();});
-
-    document.getElementById('btn-save').addEventListener('click', ()=>{
-      const title = projTitle.value.trim();
-      const desc = projDesc.value.trim();
-      const link = projLink.value.trim();
-      const pass = projPass.value.trim();
-      if(!title||!link){alert('제목과 링크는 필수입니다.');return;}
-      if(pass!=="2580"){alert('비밀번호가 틀렸습니다.');return;}
-      push(projectsRef, {title,desc,link});
-      hidePopup();
-    });
-
-    document.getElementById('btn-update').addEventListener('click', ()=>{
-      if(!editingKey) return;
-      const title = projTitle.value.trim();
-      const desc = projDesc.value.trim();
-      const link = projLink.value.trim();
-      const pass = projPass.value.trim();
-      if(pass!=="2580"){alert('비밀번호가 틀렸습니다.');return;}
-      update(ref(db, `projects/${editingKey}`), {title,desc,link});
-      hidePopup();
-    });
-
-    const projTitle=document.getElementById('proj-title');
-    const projDesc=document.getElementById('proj-desc');
-    const projLink=document.getElementById('proj-link');
-    const projPass=document.getElementById('proj-pass');
+    renderProjects();
   </script>
 </body>
 </html>
