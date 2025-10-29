@@ -48,6 +48,7 @@
       <h1>포트폴리오에 오신 것을 환영합니다</h1>
       <p>아래에서 프로젝트를 확인하고 GitHub 링크로 바로 이동하세요.</p>
     </div>
+
     <section class="projects" id="projects"></section>
   </main>
 
@@ -60,8 +61,8 @@
       <textarea id="proj-desc" placeholder="설명 및 개발 로그"></textarea>
       <label>GitHub 링크</label>
       <input type="text" id="proj-link" placeholder="https://github.com/username/repo">
-      <label id="pw-label" style="display:none;">비밀번호</label>
-      <input type="password" id="proj-pw" placeholder="비밀번호 입력" style="display:none;">
+      <label>비밀번호</label>
+      <input type="password" id="proj-pass" placeholder="비밀번호 입력">
       <button id="btn-save">저장</button>
       <button id="btn-github" style="display:none;">GitHub 이동</button>
     </div>
@@ -71,7 +72,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, push, update, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyAaYIB1Ows4tOVIQotQCyFHFR2h3pBEeTg",
@@ -87,11 +88,12 @@
     const app = initializeApp(FIREBASE_CONFIG);
     const db = getDatabase(app);
     const projectsRef = ref(db, 'projects');
+
     let projects = [];
 
     onValue(projectsRef, snapshot => {
       const data = snapshot.val() || {};
-      projects = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+      projects = Object.values(data);
       renderProjects();
     });
 
@@ -104,44 +106,36 @@
         card.style.animationDelay = `${i*0.1}s`;
         card.innerHTML = `<div class="card-body"><h3>${p.title}</h3><p>${p.desc.substring(0,50)}...</p></div>`;
         container.appendChild(card);
+
         card.addEventListener('click', ()=>showProjectDetail(p));
       });
     }
 
     function showPopup(){
+      const popup = document.getElementById('popup');
       document.getElementById('popup-title').textContent='프로젝트 추가';
       document.getElementById('proj-title').value='';
       document.getElementById('proj-desc').value='';
       document.getElementById('proj-link').value='';
-      document.getElementById('proj-pw').style.display='none';
-      document.getElementById('pw-label').style.display='none';
-      document.getElementById('btn-save').textContent='저장';
-      document.getElementById('btn-save').onclick=saveProject;
+      document.getElementById('proj-pass').value='';
+      document.getElementById('btn-save').style.display='inline-block';
       document.getElementById('btn-github').style.display='none';
+      popup.style.animation='popupFade 0.3s forwards';
       document.getElementById('popup-overlay').style.display='flex';
     }
 
     function showProjectDetail(proj){
+      const popup = document.getElementById('popup');
       document.getElementById('popup-title').textContent='프로젝트 상세보기';
-      document.getElementById('proj-title').value=proj.title;
-      document.getElementById('proj-desc').value=proj.desc;
-      document.getElementById('proj-link').value=proj.link;
-      document.getElementById('proj-pw').style.display='block';
-      document.getElementById('pw-label').style.display='block';
-      const saveBtn=document.getElementById('btn-save');
-      const githubBtn=document.getElementById('btn-github');
-      saveBtn.textContent='수정';
+      document.getElementById('proj-title').value = proj.title;
+      document.getElementById('proj-desc').value = proj.desc;
+      document.getElementById('proj-link').value = proj.link;
+      document.getElementById('proj-pass').value = ''; // 상세보기에서도 비번 입력 가능
+      document.getElementById('btn-save').style.display='none';
+      const githubBtn = document.getElementById('btn-github');
       githubBtn.style.display='inline-block';
-      githubBtn.onclick=()=>window.open(proj.link,'_blank');
-      saveBtn.onclick=()=>{
-        const pw=document.getElementById('proj-pw').value;
-        if(pw!=='2580'){alert('비밀번호가 올바르지 않습니다.');return;}
-        const title=document.getElementById('proj-title').value.trim();
-        const desc=document.getElementById('proj-desc').value.trim();
-        const link=document.getElementById('proj-link').value.trim();
-        update(ref(db, 'projects/'+proj.id),{title,desc,link});
-        hidePopup();
-      };
+      githubBtn.onclick = ()=>window.open(proj.link,'_blank');
+      popup.style.animation='popupFade 0.3s forwards';
       document.getElementById('popup-overlay').style.display='flex';
     }
 
@@ -149,17 +143,24 @@
       document.getElementById('popup-overlay').style.display='none';
     }
 
-    function saveProject(){
-      const title=document.getElementById('proj-title').value.trim();
-      const desc=document.getElementById('proj-desc').value.trim();
-      const link=document.getElementById('proj-link').value.trim();
-      if(!title||!link){alert('제목과 GitHub 링크는 필수입니다.');return;}
-      push(projectsRef,{title,desc,link});
-      hidePopup();
-    }
+    document.getElementById('btn-add-project').addEventListener('click', showPopup);
+    document.getElementById('popup-overlay').addEventListener('click', e=>{if(e.target===e.currentTarget) hidePopup();});
+    
+    document.getElementById('btn-save').addEventListener('click', ()=>{
+      const title = document.getElementById('proj-title').value.trim();
+      const desc = document.getElementById('proj-desc').value.trim();
+      const link = document.getElementById('proj-link').value.trim();
+      const pass = document.getElementById('proj-pass').value.trim();
 
-    document.getElementById('btn-add-project').addEventListener('click',showPopup);
-    document.getElementById('popup-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)hidePopup();});
+      if(!title || !link){ alert('제목과 GitHub 링크는 필수입니다.'); return; }
+      if(pass !== '2580'){ alert('비밀번호가 틀렸습니다.'); return; }
+
+      const newProj = {title, desc, link};
+      projects.unshift(newProj);
+      renderProjects();
+      hidePopup();
+      push(projectsRef, newProj);
+    });
   </script>
 </body>
 </html>
