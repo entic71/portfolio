@@ -130,8 +130,8 @@
       document.getElementById('proj-title').value = proj.title;
       document.getElementById('proj-desc').value = proj.desc;
       document.getElementById('proj-link').value = proj.link;
-      document.getElementById('proj-pass').value = ''; // 상세보기에서도 비번 입력 가능
-      document.getElementById('btn-save').style.display='none';
+      document.getElementById('proj-pass').value = ''; // 상세보기에서도 비밀번호 입력 가능
+      document.getElementById('btn-save').style.display='inline-block'; // 저장 버튼도 항상 보이도록
       const githubBtn = document.getElementById('btn-github');
       githubBtn.style.display='inline-block';
       githubBtn.onclick = ()=>window.open(proj.link,'_blank');
